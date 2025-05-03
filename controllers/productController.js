@@ -83,7 +83,6 @@ exports.deleteProduct = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // Check if the logged-in user is the creator
     if (product.createdBy.toString() !== req.user.userId) {
       return res
         .status(403)
@@ -103,7 +102,6 @@ exports.getProductPriceInCurrency = async (req, res) => {
   const baseCurrency = "EUR";
 
   try {
-    // Fetch product
     const product = await Product.findById(id);
     if (!product) {
       return res
@@ -140,7 +138,6 @@ exports.getProductPriceInCurrency = async (req, res) => {
           .json({ success: false, message: "Invalid currency" });
       }
 
-      // Cache it for 1 hour
       cache.set(cacheKey, exchangeRate);
     }
 

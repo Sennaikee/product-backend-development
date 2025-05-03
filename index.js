@@ -8,7 +8,6 @@ const authRoute = require("./routes/authRoute.js")
 const userRoute = require("./routes/userRoute.js")
 const cookieParser = require("cookie-parser");
 
-
 //middleware
 app.use(express.json());
 app.use(cookieParser());

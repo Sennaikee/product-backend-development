@@ -1,4 +1,3 @@
-// Get user profile
 const User = require("../models/userModel")
 const {updateProfileSchema} = require("../middleware/validator")
 exports.getProfile = async (req, res) => {
@@ -16,7 +15,7 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-// Update user profile
+
 exports.updateProfile = async (req, res) => {
   try {
     const { error, value } = updateProfileSchema.validate(req.body);
@@ -38,20 +37,3 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// exports.updateProfile = async (req, res) => {
-//   try {
-//     const updates = {
-//       username: req.body.username,
-//       email: req.body.email,
-//     };
-
-//     const updatedUser = await User.findByIdAndUpdate(req.user.id, updates, {
-//       new: true,
-//       runValidators: true,
-//     }).select("-password -__v");
-
-//     res.status(200).json({ success: true, user: updatedUser });
-//   } catch (error) {
-//     res.status(500).json({ success: false, message: "Update failed" });
-//   }
-// };
