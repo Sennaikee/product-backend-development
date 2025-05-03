@@ -3,13 +3,6 @@ const Product = require("../models/productModel");
 const {protect} = require("../middleware/auth.js")
 const router = express.Router();
 const productController = require("../controllers/productController.js")
-// const {
-//   getProducts,
-//   getProduct,
-//   createProduct,
-//   updateProduct,
-//   deleteProduct, getProductPriceInCurrency
-// } = require("../controllers/productController");
 
 router.post("/", protect, productController.createProduct);
 router.put("/:id", protect, productController.updateProduct);
