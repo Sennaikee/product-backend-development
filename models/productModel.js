@@ -8,17 +8,19 @@ const ProductSchema = mongoose.Schema(
 
     price: {
       type: Number,
-      required: true,
+      required: [true, "Please enter price"],
       default: 0,
     },
 
     description: {
       type: String,
     },
+
     category: {
       type: String,
       required: [true, "Please enter category name"],
     },
+    
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

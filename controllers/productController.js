@@ -1,8 +1,8 @@
 const axios = require("axios")
 const Product = require("../models/productModel");
+const User = require("../models/userModel")
 const cache = require("../utils/cache")
 const {createProductSchema, updateProductSchema} = require("../middleware/validator")
-require("dotenv").config();
 
 
 exports.getProducts = async (req, res) => {
@@ -20,17 +20,18 @@ exports.getProduct = async (req, res) => {
     const product = await Product.findById(id);
     res.status(200).json(product);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Invalid id" });
   }
-};
+}; 
 
 exports.createProduct = async (req, res) => {
   try {
     const { error, value } = createProductSchema.validate(req.body);
     if (error) {
+      console.log(error)
       return res
         .status(400)
-        .json({ success: false, message: error.details[0].message });
+        .json({ success: false, message: error.message });
     }
     const product = await Product.create({
       ...value,
@@ -38,6 +39,7 @@ exports.createProduct = async (req, res) => {
     });
     res.status(200).json(product);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -47,6 +49,7 @@ exports.updateProduct = async (req, res) => {
     const { id } = req.params;
     const { error, value } = updateProductSchema.validate(req.body);
     if (error) {
+      console.log(error);
       return res
         .status(400)
         .json({ success: false, message: error.details[0].message });
@@ -74,23 +77,48 @@ exports.updateProduct = async (req, res) => {
 };
 
 
+// exports.deleteProduct = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const product = await Product.findById(id);
+//     if (!product) {
+//       return res.status(404).json({ message: "Product not found" });
+//     }
+
+//     if (product.createdBy.toString() !== req.user.userId) {
+//       return res
+//         .status(403)
+//         .json({ message: "Unauthorized: Not your product" });
+//     }
+
+//     await Product.findByIdAndDelete(id);
+//     res.status(200).json({ message: "Product deleted successfully" });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
 exports.deleteProduct = async (req, res) => {
   try {
+    const user = await User.findById(req.user.userId);
+    console.log(user.role);
     const { id } = req.params;
-
+    
     const product = await Product.findById(id);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    if (product.createdBy.toString() !== req.user.userId) {
-      return res
+    if ((product.createdBy.toString() === req.user.userId) || (user.role === "superadmin")) {
+      await Product.findByIdAndDelete(id);
+      res.status(200).json({ message: "Product deleted successfully" });
+    }
+    return res
         .status(403)
         .json({ message: "Unauthorized: Not your product" });
-    }
 
-    await Product.findByIdAndDelete(id);
-    res.status(200).json({ message: "Product deleted successfully" });
+    
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

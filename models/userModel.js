@@ -24,6 +24,13 @@ const UserSchema = mongoose.Schema(
       select: false,
       minLength: [6, "Password must have 6 characters!"],
     },
+
+    role: {
+      type: String,
+      enum: ["superadmin", "admin", "user"],
+      default: "user",
+    },
+
     verified: {
       type: Boolean,
       default: false,
@@ -36,14 +43,14 @@ const UserSchema = mongoose.Schema(
       type: Number,
       select: false,
     },
-    forgotPasswordCode: {
-      type: String,
-      select: false,
-    },
-    forgotPasswordCodeValidation: {
-      type: Number,
-      select: false,
-    },
+    // forgotPasswordCode: {
+    //   type: String,
+    //   select: false,
+    // },
+    // forgotPasswordCodeValidation: {
+    //   type: Number,
+    //   select: false,
+    // },
   },
   { timestamps: true }
 );
