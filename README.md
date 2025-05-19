@@ -81,6 +81,8 @@ Response:
 ```
 * POST /api/auth/signin
 * POST /api/auth/signout
+* PATCH /api/auth/verifyVerificationCode
+* PATCH /api/auth/sendVerificationCode
 
 ### Products
 * POST /api/products – Create a new product
