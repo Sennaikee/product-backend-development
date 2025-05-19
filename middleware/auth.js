@@ -1,11 +1,9 @@
 const jwt = require("jsonwebtoken");
-require("dotenv").config();
 const User = require("../models/userModel")
 
 exports.protect = async (req, res, next) => {
   try {
     const authHeader = req.header("Authorization");
-
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res
         .status(401)
@@ -16,7 +14,7 @@ exports.protect = async (req, res, next) => {
     console.log(token)
 
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    const user = await User.findById(decoded.userId).select('username email role verified');
+    // const user = await User.findById(decoded.userId).select('username email role verified');
     // req.user = user;
     // console.log("Decoded user:", user);
 

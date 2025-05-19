@@ -1,5 +1,4 @@
 const express = require('express')
-const User = require("../models/userModel")
 const router = express.Router();
 const authController = require("../controllers/authController")
 const {protect, isSuperAdmin, isVerified} = require("../middleware/auth")

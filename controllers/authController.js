@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken')
 const { signupSchema, signinSchema, acceptCodeSchema } = require("../middleware/validator");
 const User = require("../models/userModel");
-require("dotenv").config();
 const { doHash, doHashValidation, hmacProcess } = require("../utils/hashing");
 const transport = require('../middleware/sendMail');
 
@@ -42,7 +41,7 @@ exports.signup = async (req, res) => {
       .status(201)
       .json({ success: true, message: "Account created successfully", result });
   } catch (error) {
-    console.log(error);
+    console.log("Signup error: ", error);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
@@ -71,14 +70,6 @@ exports.signin = async(req, res) => {
             .json({ success: false, message: "Invalid Password" });
         
         }
-        // if (!existingUser.verified) {
-        //   return res
-        //     .status(401)
-        //     .json({
-        //       success: false,
-        //       message: "Please verify your account before signing in",
-        //     });
-        // }
         
         const token = jwt.sign({
             userId: existingUser._id,
@@ -96,15 +87,19 @@ exports.signin = async(req, res) => {
             message: "logged in successfully",
           });
     } catch (error) {
-        console.log(error)
+        console.log("Sign in error", error)
     } 
 }
 
 exports.signout = async (req, res) => {
-  res
+  try {
+    res
     .clearCookie("Authorization")
     .status(200)
     .json({ success: true, message: "logged out successfully" });
+  } catch (error) {
+    console.log("Sign out error", error)
+  } 
 };
 
 exports.sendVerificationCode = async (req, res) => {
@@ -139,7 +134,7 @@ exports.sendVerificationCode = async (req, res) => {
     }
     res.status(400).json({ success: false, message: "Code sent failed!" });
   } catch (error) {
-    console.log(error);
+    console.log("Sending verification code error", error);
   }
 };
 
@@ -206,7 +201,7 @@ exports.verifyVerificationCode = async (req, res) => {
       .status(400)
       .json({ success: false, message: "unexpected occured!!" });
   } catch (error) {
-    console.log(error);
+    console.log("Verifying code error", error);
   }
 };
 
@@ -224,9 +219,8 @@ exports.makeAdmin = async (req, res) => {
     await user.save();
     res.json({ success: true, message: "User promoted to admin" });
   } catch (error) {
-    console.log(error)
+    console.log("Error adding admin", error)
   }
-  
 };
 
 

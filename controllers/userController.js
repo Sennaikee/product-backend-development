@@ -1,8 +1,7 @@
 const User = require("../models/userModel")
 const {updateProfileSchema} = require("../middleware/validator")
 exports.getProfile = async (req, res) => {
-  try {
-    
+  try {   
     const user = await User.findById(req.user.userId);
     console.log(user)
     if (!user) {
@@ -10,9 +9,9 @@ exports.getProfile = async (req, res) => {
         .status(404)
         .json({ success: false, message: "User not found" });
     }
-
     res.status(200).json({ success: true, user });
   } catch (error) {
+    console.log("Error getting profile: ", error);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
@@ -35,7 +34,7 @@ exports.updateProfile = async (req, res) => {
 
     res.status(200).json({ success: true, user: updatedUser });
   } catch (error) {
-    console.log(error)
+    console.log("Error updating profile: ", error)
     res.status(500).json({ success: false, message: "Usename or email already exists" });
   }
 };
@@ -45,6 +44,7 @@ exports.getAllUsers = async(req, res) => {
     const products = await User.find({});
     res.status(200).json(products);
   } catch (error) {
+    console.log("Error getting all users: ", error);
     res.status(500).json({ message: error.message });
   }
 }

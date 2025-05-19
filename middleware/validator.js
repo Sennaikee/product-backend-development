@@ -114,6 +114,11 @@ exports.acceptCodeSchema = Joi.object({
     .required()
     .email({
       tlds: { allow: ["com", "net"] },
+    })
+    .messages({
+      "string.base": "Email must be a string",
+      "string.empty": "Email is required",
+      "string.email": "Email must be a valid email address",
     }),
   providedCode: Joi.number().required(),
 });
