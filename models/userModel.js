@@ -35,12 +35,8 @@ const UserSchema = mongoose.Schema(
       default: false,
     },
     verificationCode: {
-      type: String,
-      select: false,
-    },
-    verificationCodeValidation: {
-      type: Number,
-      select: false,
+      code: { type: Number },
+      expiresAt: { type: Date },
     },
     // forgotPasswordCode: {
     //   type: String,

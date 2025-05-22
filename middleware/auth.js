@@ -14,9 +14,6 @@ exports.protect = async (req, res, next) => {
     console.log(token)
 
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    // const user = await User.findById(decoded.userId).select('username email role verified');
-    // req.user = user;
-    // console.log("Decoded user:", user);
 
     req.user = decoded;
 
@@ -31,18 +28,18 @@ exports.protect = async (req, res, next) => {
 
 exports.isSuperAdmin = async(req, res, next) => {
   const user = await User.findById(req.user.userId);
-  // console.log(user.role)
+
   if (user.role !== "superadmin") {
-    return res.status(403).json({ success: false, message: "Forbidden" });
+    return res.status(403).json({ success: false, message: "Access denied" });
   }
   next();
 };
 
 exports.isAdmin = async (req, res, next) => {
   const user = await User.findById(req.user.userId);
-  // console.log(user.role)
+
   if (user.role !== "admin") {
-    return res.status(403).json({ success: false, message: "Forbidden" });
+    return res.status(403).json({ success: false, message: "Access Denied" });
   }
   next();
 };
@@ -54,7 +51,7 @@ exports.isAdminOrSuperAdmin = async(req, res, next) => {
     if (user.role === "admin" || user.role === "superadmin") {
       return next();
     }
-    return res.status(403).json({ success: false, message: "Forbidden" });
+    return res.status(403).json({ success: false, message: "Access Denied" });
   } catch (error) {
     console.error("Role check error:", error);
     return res.status(500).json({ success: false, message: "Server error" });
@@ -119,7 +116,7 @@ exports.isVerified = async (req, res, next) => {
     console.error("isVerified error:", error);
     return res
       .status(500)
-      .json({ success: false, message: "Internal server error" });
+      .json({ success: false, message: "Server error" });
   }
 };
 

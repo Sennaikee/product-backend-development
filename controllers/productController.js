@@ -77,30 +77,7 @@ exports.updateProduct = async (req, res) => {
     console.log("Error updating product: ", error);
     res.status(500).json({ message: error.message });
   }
-};
-
-
-// exports.deleteProduct = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-
-//     const product = await Product.findById(id);
-//     if (!product) {
-//       return res.status(404).json({ message: "Product not found" });
-//     }
-
-//     if (product.createdBy.toString() !== req.user.userId) {
-//       return res
-//         .status(403)
-//         .json({ message: "Unauthorized: Not your product" });
-//     }
-
-//     await Product.findByIdAndDelete(id);
-//     res.status(200).json({ message: "Product deleted successfully" });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
+}; 
 
 exports.deleteProduct = async (req, res) => {
   try {
@@ -133,8 +110,6 @@ exports.deleteProduct = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-
 
 exports.getProductPriceInCurrency = async (req, res) => {
   const { id, currency } = req.params;
