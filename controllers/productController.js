@@ -98,11 +98,10 @@ exports.deleteProduct = async (req, res) => {
         .status(403)
         .json({ message: "Unauthorized: Not your product" });
     } else {
-      const result = await User.deleteMany({}); // Deletes all users
+      const result = await Product.deleteMany({}); 
       res.status(200).json({
         success: true,
-        message: "All users deleted successfully",
-        deletedCount: result.deletedCount,
+        message: "All products deleted successfully",
       });
     }   
   } catch (error) {

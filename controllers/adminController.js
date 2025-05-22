@@ -9,7 +9,6 @@ exports.makeAdmin = async (req, res) => {
     }
 
     user.role = "admin";
-
     await user.save();
     res.json({ success: true, message: "User promoted to admin" });
   } catch (error) {
@@ -19,13 +18,26 @@ exports.makeAdmin = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const products = await User.find({});
-    res.status(200).json(products);
+    let users;
+    const user = await User.findById(req.user.userId); 
+    if (user.role === "superadmin") {
+      users = await User.find({ role: { $in: ["user", "admin"] } }).select(
+        "-verificationCode"
+      );
+    } else if (user.role === "admin") {
+      users = await User.find({ role: "user" }).select("-verificationCode");
+    } else {
+        console.log(req.user)
+        console.log(user)
+      return res.status(403).json({ message: "Access denied" });    
+    }
+    res.status(200).json({ success: true, users });
   } catch (error) {
     console.log("Error getting all users: ", error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
+  
 
 exports.deleteOneOrManyOrAllUsers = async (req, res) => {
   try {
