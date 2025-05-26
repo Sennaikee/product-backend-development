@@ -22,7 +22,7 @@ exports.getProduct = async (req, res) => {
     res.status(200).json(product);
   } catch (error) {
     console.log("Error getting product: ", error);;
-    res.status(500).json({ message: "Invalid id" });
+    res.status(400).json({ message: "Invalid id" });
   }
 }; 
 

@@ -11,19 +11,19 @@ exports.signup = async (req, res) => {
     //validate the request body
     const { error, value } = signupSchema.validate({ username, email, password });
     if (error) {
-      return res.status(401).json({ success: false, message: error.details[0].message });
+      return res.status(400).json({ success: false, message: error.details[0].message });
     }
 
     // check if the username exists
     const existingUsername = await User.findOne({ username });
     if (existingUsername) {
-      return res.status(401).json({ success: false, message: "Username unavailable" });
+      return res.status(400).json({ success: false, message: "Username unavailable" });
     }
 
     // check if the user email exists
     const user = await User.findOne({ email });
     if (user) {
-      return res.status(401).json({ success: false, message: "User already exists" });
+      return res.status(400).json({ success: false, message: "User already exists" });
     }
 
     // hash the password and create a new user
@@ -73,7 +73,7 @@ exports.signin = async(req, res) => {
         const {error, value} = signinSchema.validate({email, password})
         if (error) {
           return res
-            .status(401)
+            .status(400)
             .json({ success: false, message: error.details[0].message });
         }
         const existingUser = await User.findOne({ email }).select(
@@ -83,7 +83,7 @@ exports.signin = async(req, res) => {
         // check if user exists
         if (!existingUser) {
           return res
-            .status(401)
+            .status(404)
             .json({ success: false, message: "User does not exist" });
         }
 
@@ -91,7 +91,7 @@ exports.signin = async(req, res) => {
         const result = await doHashValidation(password, existingUser.password)
         if (!result){
             return res
-            .status(401)
+            .status(400)
             .json({ success: false, message: "Invalid Password" });       
         }
 
@@ -116,7 +116,7 @@ exports.signin = async(req, res) => {
             console.log("Error while sending mail");
             res.status(500).json({ message: "Failed to send mail" });
           }
-        return res.status(401).json({ msg: "Account not verified. Verification code sent, please verify your account." });  
+        return res.status(403).json({ msg: "Account not verified. Verification code sent, please verify your account." });  
         } 
         
         // generate token for user
@@ -127,7 +127,7 @@ exports.signin = async(req, res) => {
           role: existingUser.role
         };
         const token = generateToken(payload);
-        res.json({ token, message: "Login successful" });
+        res.status(200).json({ token, message: "Login successful" });
     } catch (error) {
         console.log("Sign in error", error)
     } 
@@ -140,6 +140,7 @@ exports.signout = async (req, res) => {
     .status(200)
     .json({ success: true, message: "logged out successfully" });
   } catch (error) {
+    res.status(500).json({message: "Server error"})
     console.log("Sign out error", error)
   } 
 };
@@ -156,13 +157,13 @@ exports.verifyVerificationCode = async (req, res) => {
     
     if (error) {
       return res
-        .status(401)
+        .status(400)
         .json({ success: false, message: error.details[0].message });
     }
 
     if (!user) {
       return res
-        .status(401)
+        .status(400)
         .json({ message: "Invalid or expired OTP for email verification" });
     }
 
@@ -177,9 +178,10 @@ exports.verifyVerificationCode = async (req, res) => {
       verified: user.verified,
     };
     const token = generateToken(payload);
-    res.json({ token, msg: "Account verification successful" });  
+    res.status(200).json({ token, msg: "Account verification successful" });  
   } catch (error) {
     console.log("Verifying code error", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 

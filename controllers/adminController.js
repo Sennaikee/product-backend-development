@@ -10,7 +10,7 @@ exports.makeAdmin = async (req, res) => {
 
     user.role = "admin";
     await user.save();
-    res.json({ success: true, message: "User promoted to admin" });
+    res.status(200).json({ success: true, message: "User promoted to admin" });
   } catch (error) {
     console.log("Error adding admin", error);
   }

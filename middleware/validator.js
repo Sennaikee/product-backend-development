@@ -9,7 +9,7 @@ exports.signupSchema = Joi.object({
     .min(6)
     .max(60)
     .required()
-    .email({ tlds: { allow: ["com", "net"] } })
+    .email()
     .messages({
       "string.email": "Please enter a valid email",
       "string.empty": "Email is required",
