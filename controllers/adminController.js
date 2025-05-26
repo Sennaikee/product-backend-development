@@ -114,7 +114,7 @@ exports.deleteOneOrManyOrAllUsers = async (req, res) => {
       });
       res.status(200).json({
         success: true,
-        message: "All regular users and admins deleted successfully",
+        message: "All regular users and admins deleted successfully!",
         deletedCount: result.deletedCount,
       });
     }
