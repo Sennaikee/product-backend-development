@@ -63,7 +63,6 @@ exports.deleteOneOrManyOrAllUsers = async (req, res) => {
       }
       await User.findByIdAndDelete(id);
       return res.status(200).json({ message: "User deleted successfully" });
-
     
     } else if (userIds) {
       if (!Array.isArray(userIds) || userIds.length === 0) {
@@ -82,7 +81,7 @@ exports.deleteOneOrManyOrAllUsers = async (req, res) => {
         res.status(500).json({ success: false, message: "Server error" });
       }
     } else {
-      const result = await User.deleteMany({ role: "user" });
+      const result = await User.deleteMany({});
       res.status(200).json({
         success: true,
         message: "All regular users deleted successfully",
