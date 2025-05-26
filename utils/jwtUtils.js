@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 exports.generateVerificationCode = () => {
-    return Math.floor(Math.random() * 1000000);
+  return String(Math.floor(100000 + Math.random() * 900000)); // always 6-digit number
 };
 
 exports.generateToken = (payload) => {

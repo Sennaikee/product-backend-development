@@ -107,6 +107,16 @@ exports.updateProfileSchema = Joi.object({
   }),
 });
 
+
 exports.acceptCodeSchema = Joi.object({
-  providedCode: Joi.number().required(),
+  providedCode: Joi.string()
+    .length(6) // optional: ensures it's exactly 5 characters long
+    .pattern(/^\d+$/) // optional: ensures it only contains digits
+    .required()
+    .messages({
+      "string.base": "Verification code must be a string",
+      "string.empty": "Verification code is required",
+      "string.length": "Verification code must be exactly 6 characters",
+      "string.pattern.base": "Verification code must contain only digits",
+    }),
 });
