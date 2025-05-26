@@ -6,6 +6,6 @@ const { protect, isSuperAdmin, isAdminOrSuperAdmin, isVerified } = require("../m
 router.put("/make-admin/:userId", protect, isSuperAdmin, isVerified, adminController.makeAdmin);
 router.get("/", protect, isAdminOrSuperAdmin, adminController.getAllUsers);
 router.delete("/", protect, isSuperAdmin, adminController.deleteOneOrManyOrAllUsers);
-router.delete( "/:id", protect, isAdminOrSuperAdmin, adminController.deleteOneOrManyOrAllUsers);
+router.delete( "/:id", protect, adminController.deleteOneOrManyOrAllUsers);
 
 module.exports = router;

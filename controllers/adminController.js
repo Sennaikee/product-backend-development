@@ -43,13 +43,28 @@ exports.deleteOneOrManyOrAllUsers = async (req, res) => {
   try {
     const { id } = req.params;
     const { userIds } = req.body || {};
+    const currentUser = await User.findById(req.user.userId); // assumed set in protect middleware
+    const currentUserId = currentUser.userId;
+    const currentUserRole = currentUser.role;
     if (id) {
-      const user = await User.findById(id);
-      if (!user) {
+      const userToDelete = await User.findById(id);
+      if (!userToDelete) {
         return res.status(404).json({ message: "User not found" });
+      }
+      // Check permissions
+      if (currentUserRole === "user") {
+        if (id !== currentUserId) {
+          return res.status(403).json({ message: "You can only delete your own account." });
+        }
+      } else if (currentUserRole === "admin") {
+        if (id !== currentUserId && userToDelete.role !== "user") {
+          return res.status(403).json({ message: "Admins can only delete users or their own account." });
+        }
       }
       await User.findByIdAndDelete(id);
       return res.status(200).json({ message: "User deleted successfully" });
+
+    
     } else if (userIds) {
       if (!Array.isArray(userIds) || userIds.length === 0) {
         return res

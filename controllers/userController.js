@@ -32,7 +32,7 @@ exports.updateProfile = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(req.user.userId, newUser, {
       new: true,
       runValidators: true,
-    });
+    }).select("-verificationCode");
 
     res.status(200).json({ success: true, user: updatedUser });
   } catch (error) {
