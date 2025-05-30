@@ -1,14 +1,31 @@
-const axios = require("axios")
+const axios = require("axios");
 const Product = require("../models/productModel");
-const User = require("../models/userModel")
-const cache = require("../utils/cache")
-const {createProductSchema, updateProductSchema} = require("../middleware/validator")
-
+const User = require("../models/userModel");
+const cache = require("../utils/cache");
+const {
+  createProductSchema,
+  updateProductSchema,
+} = require("../middleware/validatorMiddleware");
 
 exports.getProducts = async (req, res) => {
   try {
-    const products = await Product.find({});
-    res.status(200).json(products);
+    const { page = 1, limit = 5 } = req.query;
+    let query = {};
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const totalProducts = await Product.countDocuments(query);
+    const products = await Product.find(query)
+      .skip(skip)
+      .limit(parseInt(limit));
+    res.status(200).json({
+      success: true,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalProducts,
+      totalPages: Math.ceil(totalProducts / limit),
+      results: products.length,
+      products,
+    });
+    // res.status(200).json(products);
   } catch (error) {
     console.log("Error getting all products", error);
     res.status(500).json({ message: error.message });
@@ -18,22 +35,21 @@ exports.getProducts = async (req, res) => {
 exports.getProduct = async (req, res) => {
   try {
     const { id } = req.params;
+
     const product = await Product.findById(id);
     res.status(200).json(product);
   } catch (error) {
-    console.log("Error getting product: ", error);;
+    console.log("Error getting product: ", error);
     res.status(400).json({ message: "Invalid id" });
   }
-}; 
+};
 
 exports.createProduct = async (req, res) => {
   try {
     const { error, value } = createProductSchema.validate(req.body);
     if (error) {
-      console.log(error)
-      return res
-        .status(400)
-        .json({ success: false, message: error.message });
+      console.log(error);
+      return res.status(400).json({ success: false, message: error.message });
     }
     const product = await Product.create({
       ...value,
@@ -77,7 +93,7 @@ exports.updateProduct = async (req, res) => {
     console.log("Error updating product: ", error);
     res.status(500).json({ message: error.message });
   }
-}; 
+};
 
 exports.deleteProduct = async (req, res) => {
   try {
@@ -88,22 +104,25 @@ exports.deleteProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
-    
+
     if (id) {
-      if ((product.createdBy.toString() === req.user.userId) || (user.role === "superadmin")) {
-      await Product.findByIdAndDelete(id);
-      res.status(200).json({ message: "Product deleted successfully" });
-    }
-    return res
+      if (
+        product.createdBy.toString() === req.user.userId ||
+        user.role === "superadmin"
+      ) {
+        await Product.findByIdAndDelete(id);
+        res.status(200).json({ message: "Product deleted successfully" });
+      }
+      return res
         .status(403)
         .json({ message: "Unauthorized: Not your product" });
     } else {
-      const result = await Product.deleteMany({}); 
+      const result = await Product.deleteMany({});
       res.status(200).json({
         success: true,
         message: "All products deleted successfully",
       });
-    }   
+    }
   } catch (error) {
     console.log("Error deleting product: ", error);
     res.status(500).json({ message: error.message });
@@ -172,4 +191,3 @@ exports.getProductPriceInCurrency = async (req, res) => {
       .json({ success: false, message: "Currency conversion failed" });
   }
 };
-

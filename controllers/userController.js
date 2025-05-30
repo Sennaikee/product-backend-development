@@ -1,11 +1,11 @@
-const User = require("../models/userModel")
-const {updateProfileSchema} = require("../middleware/validator")
+const User = require("../models/userModel");
+const { updateProfileSchema } = require("../middleware/validatorMiddleware");
 exports.getProfile = async (req, res) => {
-  try {   
+  try {
     const user = await User.findById(req.user.userId).select(
       "-verificationCode"
     );
-    console.log(user)
+    console.log(user);
     if (!user) {
       return res
         .status(404)
@@ -18,7 +18,6 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-
 exports.updateProfile = async (req, res) => {
   try {
     const { error, value } = updateProfileSchema.validate(req.body);
@@ -27,8 +26,8 @@ exports.updateProfile = async (req, res) => {
         .status(400)
         .json({ success: false, message: error.details[0].message });
     }
-    const {username, email} = value;
-    const newUser = {username, email}
+    const { username, email } = value;
+    const newUser = { username, email };
     const updatedUser = await User.findByIdAndUpdate(req.user.userId, newUser, {
       new: true,
       runValidators: true,
@@ -36,7 +35,9 @@ exports.updateProfile = async (req, res) => {
 
     res.status(200).json({ success: true, user: updatedUser });
   } catch (error) {
-    console.log("Error updating profile: ", error)
-    res.status(500).json({ success: false, message: "Usename or email already exists" });
+    console.log("Error updating profile: ", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Usename or email already exists" });
   }
 };

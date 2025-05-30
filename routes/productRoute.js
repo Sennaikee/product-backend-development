@@ -1,5 +1,5 @@
 const express = require("express");
-const {protect, isAdmin, isSuperAdmin, isAdminOrSuperAdmin} = require("../middleware/auth.js")
+const {protect, isAdmin, isSuperAdmin, isAdminOrSuperAdmin} = require("../middleware/authMiddleware.js")
 const router = express.Router();
 const productController = require("../controllers/productController.js")
 

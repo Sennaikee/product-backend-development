@@ -20,25 +20,54 @@ exports.makeAdmin = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-    let users;
-    const user = await User.findById(req.user.userId); 
-    if (user.role === "superadmin") {
-      users = await User.find({ role: { $in: ["user", "admin"] } }).select(
-        "-verificationCode"
-      );
-    } else if (user.role === "admin") {
-      users = await User.find({ role: "user" }).select("-verificationCode");
-    } else {
-        console.log(req.user)
-        console.log(user)
-      return res.status(403).json({ message: "Access denied" });    
+    const { role, page = 1, limit = 5 } = req.query; // from the URL query string
+    const user = await User.findById(req.user.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
-    res.status(200).json({ success: true, users });
+
+    let query = {};
+    
+    // Permission check
+    if (user.role === "superadmin") {
+      // Can get users, admins, or both
+      if (role === "admin") {
+        query.role = "admin";
+      } else if (role === "user") {
+        query.role = "user";
+      } else {
+        query.role = { $in: ["user", "admin"] }; // get all
+      }
+    } else if (user.role === "admin") {
+      // Can only get users
+      if (role && role !== "user") {
+        return res.status(403).json({ message: "Admins can only view users" });
+      }
+      query.role = "user";
+    } else {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const totalUsers = await User.countDocuments(query);
+    const users = await User.find(query).select("-verificationCode").skip(skip).limit(parseInt(limit));
+    res.status(200).json({
+      success: true,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      totalUsers,
+      totalPages: Math.ceil(totalUsers / limit),
+      results: users.length,
+      users,
+    });
+
   } catch (error) {
-    console.log("Error getting all users: ", error);
+    console.error("Error getting users:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
   
 
 exports.deleteOneOrManyOrAllUsers = async (req, res) => {
